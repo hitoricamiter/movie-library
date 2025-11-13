@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="clickHandlers"
+            type="ru.zaikin.mvvmproject.AddEditActivity.AddEditActivityClickHandlers" />
+
+        <variable
+            name="movie"
+            type="ru.zaikin.mvvmproject.model.Movie" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#F2F2F2"
+        android:gravity="center_horizontal"
+        tools:context=".AddEditActivity">
+
+        <EditText
+            android:id="@+id/movieNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="Name"
+            android:text="@={movie.name}"
+            android:textSize="20sp"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000000"
+            android:fontFamily="sans-serif-medium"
+            android:elevation="4dp"
+            android:inputType="textPersonName"
+            android:clipToOutline="true" />
+
+        <EditText
+            android:id="@+id/movieDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Description"
+            android:text="@={movie.movieDescription}"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000000"
+            android:fontFamily="sans-serif"
+            android:elevation="4dp"
+            android:clipToOutline="true"
+            android:inputType="textMultiLine"
+            android:minLines="3" />
+
+        <TextView
+            android:id="@+id/movieNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Name"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:fontFamily="sans-serif-medium"
+            android:background="#E0E0FF"
+            android:padding="10dp"
+            android:elevation="2dp"
+            android:clipToOutline="true" />
+
+        <TextView
+            android:id="@+id/movieDescriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Description"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:fontFamily="sans-serif"
+            android:background="#E0E0FF"
+            android:padding="10dp"
+            android:elevation="2dp"
+            android:clipToOutline="true" />
+
+        <Button
+            android:id="@+id/okButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Submit"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:background="#6200EE"
+            android:padding="14dp"
+            android:fontFamily="sans-serif-medium"
+            android:elevation="6dp"
+            android:clipToOutline="true"
+            android:onClick="@{clickHandlers::onOkButtonClicked}" />
+
+    </LinearLayout>
+</layout>
