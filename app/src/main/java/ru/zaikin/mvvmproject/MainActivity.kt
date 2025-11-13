@@ -2,7 +2,6 @@ package ru.zaikin.mvvmproject
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -12,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ru.zaikin.mvvmproject.databinding.ActivityMainBinding
@@ -26,8 +26,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var clickHandler: MainActivityClickHandlers
     private lateinit var selectedGenre: Genre
-    private lateinit var genreList: ArrayList<Genre>
-    private lateinit var movieList: ArrayList<Movie>
+    private var genreList = ArrayList<Genre>()
+    private var movieList = ArrayList<Movie>()
     private lateinit var recyclerView: RecyclerView
     private lateinit var movieAdapter: MovieAdapter
     private var selectedMovieId: Int = 0
@@ -47,13 +47,8 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
 
-        viewModel.genres.observe(this, Observer { value ->
-            genreList = ArrayList(value ?: emptyList())
-
-            for (genre in genreList) {
-                Log.d("WATCH_HERE", "Genre id=${genre.id}, name=${genre.genre}")
-            }
-
+        viewModel.genres.observe(this, Observer { genres ->
+            genreList = ArrayList(genres ?: emptyList())
             showInSpinner()
         })
     }
@@ -72,20 +67,23 @@ class MainActivity : AppCompatActivity() {
 
         fun onSelectedItem(parent: AdapterView<*>, view: View, position: Int, id: Long) {
             selectedGenre = parent.getItemAtPosition(position) as Genre
-            val msg = "id is ${selectedGenre.id}\nname is ${selectedGenre.genre}"
-            Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
-            loadGenreMovieInArrayList(selectedGenre.id.toInt())
+            Toast.makeText(
+                this@MainActivity,
+                "id: ${selectedGenre.id}\nname: ${selectedGenre.genre}",
+                Toast.LENGTH_SHORT
+            ).show()
+            loadGenreMovies(selectedGenre.id.toInt())
         }
     }
 
-    private fun loadGenreMovieInArrayList(genreId: Int) {
-        viewModel.getMoviesByGenre(genreId).observe(this, Observer { value ->
-            movieList = ArrayList(value ?: emptyList())
-            loadRecyclerView()
+    private fun loadGenreMovies(genreId: Int) {
+        viewModel.getMoviesByGenre(genreId).observe(this, Observer { movies ->
+            movieList = ArrayList(movies ?: emptyList())
+            setupRecyclerView()
         })
     }
 
-    private fun loadRecyclerView() {
+    private fun setupRecyclerView() {
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
@@ -105,6 +103,33 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(intent, EDIT_MOVIE_REQUEST_CODE)
             }
         })
+
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val movieToDelete = movieList[position]
+
+                viewModel.deleteMovie(movieToDelete)
+                movieList.removeAt(position)
+                movieAdapter.notifyItemRemoved(position)
+
+                Toast.makeText(this@MainActivity, "Movie deleted", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -119,8 +144,7 @@ class MainActivity : AppCompatActivity() {
                 movieDescription = data?.getStringExtra(AddEditActivity.MOVIE_DESCRIPTION).orEmpty()
             }
             viewModel.addNewMovie(movie)
-
-            loadGenreMovieInArrayList(selectedGenreId.toInt())
+            loadGenreMovies(selectedGenreId.toInt())
 
         } else if (requestCode == EDIT_MOVIE_REQUEST_CODE && resultCode == RESULT_OK) {
             val movie = Movie().apply {

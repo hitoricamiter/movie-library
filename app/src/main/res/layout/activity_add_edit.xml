@@ -56,34 +56,6 @@
             android:inputType="textMultiLine"
             android:minLines="3" />
 
-        <TextView
-            android:id="@+id/movieNameTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Name"
-            android:textSize="18sp"
-            android:textColor="#000000"
-            android:fontFamily="sans-serif-medium"
-            android:background="#E0E0FF"
-            android:padding="10dp"
-            android:elevation="2dp"
-            android:clipToOutline="true" />
-
-        <TextView
-            android:id="@+id/movieDescriptionTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Description"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:fontFamily="sans-serif"
-            android:background="#E0E0FF"
-            android:padding="10dp"
-            android:elevation="2dp"
-            android:clipToOutline="true" />
-
         <Button
             android:id="@+id/okButton"
             android:layout_width="match_parent"
